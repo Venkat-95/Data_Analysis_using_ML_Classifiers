@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy  as np
 from sklearn import datasets, linear_model, svm
+from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import Imputer, StandardScaler, MinMaxScaler, Normalizer
 from sklearn.model_selection import GridSearchCV, StratifiedShuffleSplit
 
@@ -57,19 +58,29 @@ clf.fit(X_train, y_train)
 
 mean = clf.cv_results_['mean_test_score']
 stds = clf.cv_results_['std_test_score']
-print("The best parameters are %s with a score of %0.2f"
-      % (clf.best_params_, clf.best_score_))
+print("The best parameters are %s with a score of %0.2f" % (clf.best_params_, clf.best_score_))
 best_C = clf.best_params_['C']
 best_gamma = clf.best_params_['gamma']
 clf = svm.SVC(C=best_C, gamma=best_gamma)
 clf.fit(X_train, y_train)
 
-X_test, y_test, imputer0, imputer1, scaler = preprocessing('app.test', imputer0, imputer1, scalar)
+X_test, y_test, imputer0, imputer1, scalar = preprocessing('app.test', imputer0, imputer1, scalar)
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test,y_pred)
+print("Accuracy = %.f%%" %(accuracy*100.0))
+
 
 score_train = clf.score(X_train, y_train)
 score_test = clf.score(X_test, y_test)
 
 print("Training score: {}, Test score: {}".format(score_train, score_test))
 
-# print(type(X1))
-# np.savetxt("data_imputed.data", X1, delimiter=",")
+data_unlabeled = pd.read_csv("app_unlabeled.test",na_values=["?"], header=None)
+imp = Imputer(missing_values="NaN", strategy="most_frequent", axis=0)
+imp.fit(X_train)
+data_unlabeled=imp.transform(data_unlabeled)
+data_unlabeled=scalar.transform(data_unlabeled)
+
+predictions = clf.predict(data_unlabeled)
+app_svm = np.column_stack((data_unlabeled,predictions))
+np.savetxt("app_svm.test",app_svm)

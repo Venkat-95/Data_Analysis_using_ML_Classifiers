@@ -7,6 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV, StratifiedShuffleSplit
 
 def preprocessing(file, imputer0, imputer1, scalar):
+#error_bad_lines=False
     data = pd.read_csv(file, na_values="?", header=None).values
     data0 = []
     data1 = []
@@ -20,10 +21,12 @@ def preprocessing(file, imputer0, imputer1, scalar):
             data0.append(i[0:200])
             X0.append(i[0:200])
             y0.append(i[200])
-        else:
+        elif (i[200]==1):
             data1.append(i[0:200])
             X1.append(i[0:200])
             y1.append(i[200])
+        else:
+            continue
     if (imputer0 == None and imputer1 == None):
         imputer0 = Imputer(missing_values="NaN", strategy="most_frequent", axis=0)
         imputer1 = Imputer(missing_values="NaN", strategy="most_frequent", axis=0)
@@ -45,7 +48,7 @@ def preprocessing(file, imputer0, imputer1, scalar):
     return x, y, imputer0, imputer1, scalar
 
 
-X_train, y_train, imputer0, imputer1, scalar = preprocessing("data.txt", None, None, None)
+X_train, y_train, imputer0, imputer1, scalar = preprocessing("data2.csv", None, None, None)
 
 pca = PCA(.95)
 X_train = pca.fit_transform(X_train)
@@ -68,11 +71,14 @@ best_gamma = clf.best_params_['gamma']
 clf = svm.SVC(C=best_C, gamma=best_gamma)
 clf.fit(X_train, y_train)
 
-X_test, y_test, imputer0, imputer1, scalar = preprocessing('lero_competition_raw_test_data_and_labels.txt', imputer0, imputer1, scalar)
+X_test, y_test, imputer0, imputer1, scalar = preprocessing('data1.csv', imputer0, imputer1, scalar)
 
 X_test=pca.transform(X_test)
+
 app_XTest = np.column_stack(X_test)
 np.savetxt("app_XTest.test", app_XTest)
 y_pred = clf.predict(X_test)
-accuracy = accuracy_score(y_test,y_pred)
+print(y_test)
+print(y_pred)
+accuracy = accuracy_score(y_pred,y_test,)
 print("Accuracy = %.f%%" %(accuracy*100.0))

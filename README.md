@@ -2,5 +2,6 @@
  - Support Vector Classifier ✅
  - One Class Support Vector Classifier 🚧
  - Isolation Forest 🚧
+ - Logistic Regression ✅
 
 

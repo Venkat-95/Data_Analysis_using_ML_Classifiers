@@ -1,2 +1,6 @@
-# LERO-Assignment
-Assignments under Learning Robots course.
+# ML Classifiers examined:
+ - Support Vector Classifier ✅
+ - One Class Support Vector Classifier 🚧
+ - Isolation Forest 🚧
+
+

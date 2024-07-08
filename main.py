@@ -6,16 +6,17 @@ from sklearn.preprocessing import StandardScaler
 from utils.comp_utils import svc_classifier_train, classifier_test, logistic_classifier_train
 from utils.vis_utils import visualization_pca, visualization_t_SNE
 
-def preprocessing(data: pd.DataFrame, stage, _imputer=None, _scalar=None):
+
+def preprocessing(_data: pd.DataFrame, stage, _imputer=None, _scalar=None):
     if stage == "Train":
-        num_cols = data.shape[1] - 1
-        X = np.empty((0, num_cols), dtype=data.dtypes[0])
+        num_cols = _data.shape[1] - 1
+        X = np.empty((0, num_cols), dtype=_data.dtypes[0])
     else:
-        num_cols = data.shape[1]
-        X = np.empty((0, num_cols), dtype=data.dtypes[0])
+        num_cols = _data.shape[1]
+        X = np.empty((0, num_cols), dtype=_data.dtypes[0])
     y = []
 
-    for index, row in data.iterrows():
+    for index, row in _data.iterrows():
         data_point = row.tolist()
         if data_point[-1] not in [0, 1]:
             continue
@@ -49,7 +50,7 @@ if __name__ == "__main__":
     print("Length of y train: ", len(train_y))
     svc_classifer, best_C, best_gamma, best_score = svc_classifier_train(train_X, train_y)
     print(f"Best Score for the validation set: {best_score}")
-    logistic_regression_clf, score_logits = logistic_classifier_train(train_X,train_y)
+    logistic_regression_clf, score_logits = logistic_classifier_train(train_X, train_y)
     print(f"Train_Score :{score_logits}")
 
     test_file = f"{data_path}/data_test.txt"
@@ -57,6 +58,5 @@ if __name__ == "__main__":
     test_X, test_y, imputer, scalar = preprocessing(data_test, stage="Test", _imputer=imputer, _scalar=scalar)
     y_pred_test = classifier_test(clf=svc_classifer, X_test=test_X)
     y_pred_logistic = logistic_regression_clf.predict(test_X)
-    visualization_pca(X_test=test_X,y_pred=y_pred_logistic)
-    visualization_t_SNE(X_test=test_X,y_pred=y_pred_logistic)
-
+    visualization_pca(X_test=test_X, y_pred=y_pred_logistic)
+    visualization_t_SNE(X_test=test_X, y_pred=y_pred_logistic)
